@@ -33,10 +33,7 @@
 }
 
 .hero-highlight {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary);
   display: inline-block;
 }
 
@@ -193,10 +190,7 @@
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary);
 }
 
 .cta-text {
@@ -210,6 +204,74 @@
   gap: 1.5rem;
   justify-content: center;
   flex-wrap: wrap;
+}
+
+/* DXF Showcase Section */
+.dxf-showcase {
+  padding: 6rem 0;
+  position: relative;
+  background: var(--darker-bg);
+}
+
+.dxf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.dxf-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  aspect-ratio: 1;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.dxf-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+}
+
+.dxf-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.dxf-card:hover img {
+  transform: scale(1.05);
+}
+
+.dxf-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(10, 14, 26, 0.95), transparent);
+  padding: 1.5rem;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.dxf-card:hover .dxf-overlay {
+  transform: translateY(0);
+}
+
+.dxf-overlay h4 {
+  font-family: "Orbitron", sans-serif;
+  color: var(--primary);
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.dxf-overlay p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
 }
 
 /* Responsive */
@@ -248,5 +310,8 @@
     width: 100%;
     text-align: center;
   }
+  
+  .dxf-grid {
+    grid-template-columns: 1fr;
+  }
 }
-

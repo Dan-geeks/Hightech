@@ -168,27 +168,136 @@ function HomePage() {
 
           <div className="grid grid-3">
             <ServiceCard
-              icon="??"
+              icon="📐"
               title="DXF Files Marketplace"
               description="Download ready-to-use DXF files for CNC, laser cutting, and CAD projects. Instant delivery after payment."
               link="/dxf-marketplace"
               delay={0.2}
             />
             <ServiceCard
-              icon="??"
+              icon="✏️"
               title="Custom Design Services"
               description="Professional CAD design, technical drawings, and 3D modeling tailored to your specifications."
               link="/design-services"
               delay={0.4}
             />
             <ServiceCard
-              icon="???"
+              icon="🖨️"
               title="3D Printing"
               description="High-quality 3D printing services with precision and various material options for prototypes and production."
               link="/3d-printing"
               delay={0.6}
             />
           </div>
+        </div>
+      </section>
+
+      {/* DXF Showcase */}
+      <section className="dxf-showcase">
+        <div className="container">
+          <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
+            <h2 className="section-title">FEATURED DXF DESIGNS</h2>
+            <p className="section-subtitle">Professional laser-cut ready designs from our marketplace</p>
+          </motion.div>
+
+          <div className="dxf-grid">
+            <motion.div 
+              className="dxf-card"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <img src="/Tattoo 3-01.jpg" alt="Tribal Heart Design" />
+              <div className="dxf-overlay">
+                <h4>Tribal Heart Design</h4>
+                <p>Intricate laser-cut pattern</p>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="dxf-card"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <img src="/Tattoo 9.jpg" alt="Decorative Panel" />
+              <div className="dxf-overlay">
+                <h4>Decorative Panel</h4>
+                <p>Ornate wall art design</p>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="dxf-card"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <img src="/036size.jpg" alt="Abstract Pattern" />
+              <div className="dxf-overlay">
+                <h4>Abstract Pattern</h4>
+                <p>Modern geometric design</p>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="dxf-card"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <img src="/04.jpg" alt="Mandala Design" />
+              <div className="dxf-overlay">
+                <h4>Mandala Design</h4>
+                <p>Circular symmetry pattern</p>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="dxf-card"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <img src="/3593491.jpg" alt="Floral Design" />
+              <div className="dxf-overlay">
+                <h4>Floral Design</h4>
+                <p>Nature-inspired pattern</p>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              className="dxf-card"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
+              <img src="/9055032.jpg" alt="Artistic Panel" />
+              <div className="dxf-overlay">
+                <h4>Artistic Panel</h4>
+                <p>Creative laser-cut art</p>
+              </div>
+            </motion.div>
+          </div>
+
+          <motion.div
+            className="cta-buttons"
+            style={{ marginTop: '3rem', justifyContent: 'center' }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+          >
+            <Link to="/dxf-marketplace" className="btn btn-primary">
+              View All DXF Files
+            </Link>
+          </motion.div>
         </div>
       </section>
 
@@ -258,7 +367,7 @@ function ServiceCard({ icon, title, description, link, delay }) {
         <div className="service-icon">{icon}</div>
         <h3 className="service-title">{title}</h3>
         <p className="service-description">{description}</p>
-        <div className="service-arrow">?</div>
+        <div className="service-arrow">→</div>
       </Link>
     </motion.div>
   );
@@ -281,4 +390,3 @@ function FeatureCard({ number, title, description, delay }) {
 }
 
 export default HomePage;
-

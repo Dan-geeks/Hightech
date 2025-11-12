@@ -85,10 +85,7 @@ body {
   font-weight: 900;
   display: block;
   letter-spacing: 3px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary);
 }
 
 .logo-subtext {
@@ -207,10 +204,7 @@ body {
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary);
   letter-spacing: 2px;
 }
 
@@ -247,8 +241,8 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
+  background: var(--primary);
+  color: var(--dark-bg);
   clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
 }
 
@@ -488,4 +482,3 @@ body {
     opacity: 0;
   }
 }
-
