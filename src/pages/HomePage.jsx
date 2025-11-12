@@ -1,9 +1,29 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import "./HomePage.css";
 
 function HomePage() {
+  const [typedText, setTypedText] = useState("");
+  const [showCursor, setShowCursor] = useState(true);
+  const fullText = "Premium DXF files, custom design services, and professional 3D printing solutions for engineers, architects, and makers.";
+  
+  useEffect(() => {
+    let index = 0;
+    const typingInterval = setInterval(() => {
+      if (index < fullText.length) {
+        setTypedText(fullText.slice(0, index + 1));
+        index++;
+      } else {
+        clearInterval(typingInterval);
+        // Hide cursor after a brief pause
+        setTimeout(() => setShowCursor(false), 500);
+      }
+    }, 30); // Speed of typing (30ms per character)
+    
+    return () => clearInterval(typingInterval);
+  }, []);
+
   return (
     <div className="home-page page">
       {/* Hero Section */}
@@ -32,8 +52,8 @@ function HomePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.6 }}
             >
-              Premium DXF files, custom design services, and professional 3D printing solutions for engineers, architects,
-              and makers.
+              {typedText}
+              {showCursor && <span className="typing-cursor">|</span>}
             </motion.p>
 
             <motion.div

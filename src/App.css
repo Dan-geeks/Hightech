@@ -9,12 +9,12 @@
 :root {
   --primary: #4a90e2;
   --secondary: #f39c12;
-  --dark-bg: #212529;
-  --darker-bg: #1a1d20;
-  --card-bg: #2c3034;
+  --dark-bg: #161a1d;
+  --darker-bg: #0d0f12;
+  --card-bg: #1e2226;
   --text-primary: #ffffff;
   --text-secondary: #adb5bd;
-  --border: #495057;
+  --border: #3a3f44;
   --success: #28a745;
   --warning: #ffc107;
   --accent: #6c757d;
@@ -41,14 +41,14 @@ body {
   left: 0;
   right: 0;
   z-index: 1000;
-  background: rgba(33, 37, 41, 0.95);
+  background: rgba(22, 26, 29, 0.95);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
   transition: all 0.3s ease;
 }
 
 .header.scrolled {
-  background: rgba(33, 37, 41, 0.98);
+  background: rgba(22, 26, 29, 0.98);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
