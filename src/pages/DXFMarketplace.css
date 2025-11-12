@@ -1,0 +1,90 @@
+.marketplace-hero {
+  padding: 6rem 0 3rem;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.08), rgba(255, 107, 0, 0.08));
+}
+
+.marketplace-content {
+  padding: 3rem 0 6rem;
+}
+
+.marketplace-cta {
+  margin-top: 2rem;
+}
+
+.marketplace-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.marketplace-grid {
+  margin-bottom: 3rem;
+}
+
+.marketplace-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-height: 320px;
+}
+
+.marketplace-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+}
+
+.file-name {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.4rem;
+  color: var(--text-primary);
+}
+
+.file-description {
+  color: var(--text-secondary);
+  flex-grow: 1;
+}
+
+.file-meta {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.file-price {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .marketplace-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .file-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .card-footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .card-footer .btn {
+    width: 100%;
+  }
+}
+

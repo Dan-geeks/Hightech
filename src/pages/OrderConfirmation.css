@@ -1,0 +1,61 @@
+.order-confirmation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirmation-card {
+  text-align: center;
+  padding: 4rem 3rem;
+}
+
+.confirmation-details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin: 2.5rem 0;
+  text-align: left;
+}
+
+.confirmation-details .label {
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: var(--text-secondary);
+}
+
+.confirmation-details .value {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.order-id {
+  color: var(--primary);
+}
+
+.confirmation-note {
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .confirmation-details {
+    grid-template-columns: 1fr;
+  }
+
+  .confirmation-card {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .confirmation-actions .btn {
+    width: 100%;
+  }
+}
+

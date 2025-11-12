@@ -1,0 +1,61 @@
+.services-hero {
+  padding: 6rem 0 3rem;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), rgba(255, 107, 0, 0.05));
+}
+
+.services-packages {
+  padding: 4rem 0;
+}
+
+.services-process {
+  padding: 4rem 0;
+  background: var(--darker-bg);
+}
+
+.process-card {
+  text-align: left;
+}
+
+.process-label {
+  font-size: 2rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.package-meta {
+  margin-top: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.services-form {
+  padding: 4rem 0 6rem;
+}
+
+.services-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.services-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .services-form .grid,
+  .services-packages .grid,
+  .services-process .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
