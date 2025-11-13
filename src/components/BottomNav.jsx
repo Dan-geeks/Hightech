@@ -115,8 +115,6 @@ const BottomNav = () => {
             <h4 className="footer-payment-heading">Payment Methods</h4>
             <div className="footer-payment-methods">
               <span className="payment-badge">M-Pesa</span>
-              <span className="payment-badge">Visa</span>
-              <span className="payment-badge">Mastercard</span>
             </div>
           </div>
         </div>
