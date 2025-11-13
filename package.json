@@ -4,10 +4,11 @@
   "description": "High Tec Engineering website - DXF files, design services, and 3D printing",
   "private": true,
   "dependencies": {
+    "firebase": "^12.5.0",
+    "framer-motion": "^10.16.16",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.0",
-    "framer-motion": "^10.16.16"
+    "react-router-dom": "^6.20.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
@@ -19,4 +20,3 @@
     "preview": "vite preview"
   }
 }
-

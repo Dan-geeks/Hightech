@@ -2,26 +2,70 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import "./HomePage.css";
+import {
+  collection,
+  query,
+  orderBy,
+  limit,
+  onSnapshot,
+} from "firebase/firestore";
+import { db } from "../firebase";
 
-function HomePage() {
+function HomePage({ addToCart }) {
   const [typedText, setTypedText] = useState("");
-  const [showCursor, setShowCursor] = useState(true);
-  const fullText = "Premium DXF files, custom design services, and professional 3D printing solutions for engineers, architects, and makers.";
-  
+  const fullText =
+    "Download ready-to-use DXF files for CNC, laser cutting, and CAD projects. Plus custom design services and 3D printing solutions.";
+  const [hasTyped, setHasTyped] = useState(false);
+
+  const [featuredFiles, setFeaturedFiles] = useState([]);
+  const [loadingFeatured, setLoadingFeatured] = useState(true);
+
+  // Typing effect
   useEffect(() => {
-    let index = 0;
+    if (hasTyped) return;
+
+    let currentIndex = 0;
+    const typingSpeed = 30;
+
     const typingInterval = setInterval(() => {
-      if (index < fullText.length) {
-        setTypedText(fullText.slice(0, index + 1));
-        index++;
+      if (currentIndex <= fullText.length) {
+        setTypedText(fullText.slice(0, currentIndex));
+        currentIndex++;
       } else {
         clearInterval(typingInterval);
-        // Hide cursor after a brief pause
-        setTimeout(() => setShowCursor(false), 500);
+        setHasTyped(true);
       }
-    }, 30); // Speed of typing (30ms per character)
-    
+    }, typingSpeed);
+
     return () => clearInterval(typingInterval);
+  }, [hasTyped]);
+
+  // Featured DXF files from Firestore
+  useEffect(() => {
+    const q = query(
+      collection(db, "dxfFiles"),
+      orderBy("downloads", "desc"),
+      limit(4)
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const docs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setFeaturedFiles(docs);
+        setLoadingFeatured(false);
+      },
+      (error) => {
+        console.error("Error loading featured DXF files:", error);
+        setFeaturedFiles([]);
+        setLoadingFeatured(false);
+      }
+    );
+
+    return () => unsubscribe();
   }, []);
 
   return (
@@ -35,301 +79,141 @@ function HomePage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <motion.h1
-              className="hero-title"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-            >
-              PRECISION ENGINEERING
-              <br />
-              <span className="hero-highlight">DIGITAL SOLUTIONS</span>
-            </motion.h1>
-
-            <motion.p
-              className="hero-text"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-            >
+            <h1 className="hero-title">
+              Professional DXF Files & Engineering Solutions
+            </h1>
+            <p className="hero-text">
               {typedText}
-              {showCursor && <span className="typing-cursor">|</span>}
-            </motion.p>
-
-            <motion.div
-              className="hero-buttons"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-            >
+              {!hasTyped && <span className="typing-cursor">|</span>}
+            </p>
+            <div className="hero-buttons">
               <Link to="/dxf-marketplace" className="btn btn-primary">
-                Browse DXF Files
+                Browse Marketplace
               </Link>
               <Link to="/design-services" className="btn btn-secondary">
-                Request Custom Design
+                Custom Design Services
               </Link>
-            </motion.div>
+            </div>
           </motion.div>
 
           <motion.div
             className="hero-visual"
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
           >
-            <div className="animation-container">
-              {/* Floating geometric shapes */}
-              <motion.div
-                className="floating-shape shape-1"
-                animate={{
-                  y: [0, -20, 0],
-                  rotate: [0, 180, 360],
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-              <motion.div
-                className="floating-shape shape-2"
-                animate={{
-                  y: [0, 30, 0],
-                  rotate: [0, -180, -360],
-                }}
-                transition={{
-                  duration: 10,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-              <motion.div
-                className="floating-shape shape-3"
-                animate={{
-                  y: [0, -25, 0],
-                  x: [0, 15, 0],
-                }}
-                transition={{
-                  duration: 7,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-              <motion.div
-                className="floating-shape shape-4"
-                animate={{
-                  y: [0, 20, 0],
-                  x: [0, -10, 0],
-                  rotate: [0, 90, 180, 270, 360],
-                }}
-                transition={{
-                  duration: 12,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-              
-              {/* Central rotating element */}
-              <motion.div
-                className="central-gear"
-                animate={{
-                  rotate: 360,
-                }}
-                transition={{
-                  duration: 20,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-              >
-                <div className="gear-inner"></div>
-              </motion.div>
+            <img src="/3593491.jpg" alt="DXF Design" className="hero-image" />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Featured Products */}
+      <section className="featured-section">
+        <div className="container">
+          <div className="section-header">
+            <div>
+              <h2 className="section-title">Featured DXF Files</h2>
+              <p className="section-subtitle">
+                Popular downloads from our library
+              </p>
             </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Services Overview */}
-      <section className="services-section">
-        <div className="container">
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }} 
-            whileInView={{ opacity: 1, y: 0 }} 
-            viewport={{ once: true }} 
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="section-title">OUR SERVICES</h2>
-            <p className="section-subtitle">Professional engineering solutions for every project</p>
-          </motion.div>
-
-          <div className="grid grid-3">
-            <ServiceCard
-              icon="📐"
-              title="DXF Files Marketplace"
-              description="Download ready-to-use DXF files for CNC, laser cutting, and CAD projects. Instant delivery after payment."
-              link="/dxf-marketplace"
-              delay={0.1}
-            />
-            <ServiceCard
-              icon="✏️"
-              title="Custom Design Services"
-              description="Professional CAD design, technical drawings, and 3D modeling tailored to your specifications."
-              link="/design-services"
-              delay={0.2}
-            />
-            <ServiceCard
-              icon="🖨️"
-              title="3D Printing"
-              description="High-quality 3D printing services with precision and various material options for prototypes and production."
-              link="/3d-printing"
-              delay={0.3}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* DXF Showcase */}
-      <section className="dxf-showcase">
-        <div className="container">
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }} 
-            whileInView={{ opacity: 1, y: 0 }} 
-            viewport={{ once: true }} 
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="section-title">FEATURED DXF DESIGNS</h2>
-            <p className="section-subtitle">Professional laser-cut ready designs from our marketplace</p>
-          </motion.div>
-
-          <div className="dxf-grid">
-            <motion.div 
-              className="dxf-card"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              <img src="/Tattoo 3-01.jpg" alt="Tribal Heart Design" />
-              <div className="dxf-overlay">
-                <h4>Tribal Heart Design</h4>
-                <p>Intricate laser-cut pattern</p>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              className="dxf-card"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.15 }}
-            >
-              <img src="/Tattoo 9.jpg" alt="Decorative Panel" />
-              <div className="dxf-overlay">
-                <h4>Decorative Panel</h4>
-                <p>Ornate wall art design</p>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              className="dxf-card"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <img src="/036size.jpg" alt="Abstract Pattern" />
-              <div className="dxf-overlay">
-                <h4>Abstract Pattern</h4>
-                <p>Modern geometric design</p>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              className="dxf-card"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.25 }}
-            >
-              <img src="/04.jpg" alt="Mandala Design" />
-              <div className="dxf-overlay">
-                <h4>Mandala Design</h4>
-                <p>Circular symmetry pattern</p>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              className="dxf-card"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <img src="/3593491.jpg" alt="Floral Design" />
-              <div className="dxf-overlay">
-                <h4>Floral Design</h4>
-                <p>Nature-inspired pattern</p>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              className="dxf-card"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.35 }}
-            >
-              <img src="/9055032.jpg" alt="Artistic Panel" />
-              <div className="dxf-overlay">
-                <h4>Artistic Panel</h4>
-                <p>Creative laser-cut art</p>
-              </div>
-            </motion.div>
-          </div>
-
-          <motion.div
-            className="cta-buttons"
-            style={{ marginTop: '3rem', justifyContent: 'center' }}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <Link to="/dxf-marketplace" className="btn btn-primary">
-              View All DXF Files
+            <Link to="/dxf-marketplace" className="view-all-link">
+              View All →
             </Link>
-          </motion.div>
+          </div>
+
+          {loadingFeatured ? (
+            <div className="loading">
+              <div className="spinner" />
+            </div>
+          ) : featuredFiles.length === 0 ? (
+            <p className="section-subtitle">
+              No featured DXF files yet. Add files in the admin panel to see
+              them here.
+            </p>
+          ) : (
+            <div className="grid grid-4">
+              {featuredFiles.map((file, index) => (
+                <motion.div
+                  key={file.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                >
+                  <ProductCard file={file} addToCart={addToCart} />
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
       {/* Features Section */}
       <section className="features-section">
         <div className="container">
-          <div className="grid grid-2">
-            <FeatureCard
-              number="01"
-              title="Instant Digital Delivery"
-              description="Download your DXF files immediately after payment via M-Pesa. No waiting, no hassle."
-              delay={0.1}
-            />
-            <FeatureCard
-              number="02"
-              title="Professional Quality"
-              description="All files and services meet industry standards and are optimized for manufacturing."
-              delay={0.15}
-            />
-            <FeatureCard
-              number="03"
-              title="Secure Payments"
-              description="Safe and convenient M-Pesa payment integration for all transactions."
-              delay={0.2}
-            />
-            <FeatureCard
-              number="04"
-              title="Expert Support"
-              description="Technical support and consultation available for all your engineering needs."
-              delay={0.25}
-            />
+          <div className="feature-grid">
+            <div className="feature-item">
+              <div className="feature-icon">⚡</div>
+              <div className="feature-content">
+                <h3>Instant Download</h3>
+                <p>Get your DXF files immediately after payment via M-Pesa</p>
+              </div>
+            </div>
+            <div className="feature-item">
+              <div className="feature-icon">✓</div>
+              <div className="feature-content">
+                <h3>Professional Quality</h3>
+                <p>All files are tested and optimized for manufacturing</p>
+              </div>
+            </div>
+            <div className="feature-item">
+              <div className="feature-icon">🔒</div>
+              <div className="feature-content">
+                <h3>Secure Payment</h3>
+                <p>Safe transactions through M-Pesa integration</p>
+              </div>
+            </div>
+            <div className="feature-item">
+              <div className="feature-icon">💬</div>
+              <div className="feature-content">
+                <h3>Expert Support</h3>
+                <p>Technical assistance available for all purchases</p>
+              </div>
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* Banner Section */}
+      <section className="banner-section">
+        <div className="container">
+          <motion.div
+            className="banner-card"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="banner-content">
+              <h2>Need a Custom Design?</h2>
+              <p>
+                Our engineering team can create bespoke CAD designs, technical
+                drawings, and 3D models tailored to your exact specifications.
+              </p>
+              <Link
+                to="/design-services"
+                className="btn btn-primary"
+                style={{ marginTop: "1rem" }}
+              >
+                Get Custom Quote
+              </Link>
+            </div>
+            <img
+              src="/9055032.jpg"
+              alt="Custom Design"
+              className="banner-image"
+            />
+          </motion.div>
         </div>
       </section>
 
@@ -343,14 +227,16 @@ function HomePage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="cta-title">Ready to Start Your Project?</h2>
-            <p className="cta-text">Browse our marketplace or request a custom design today</p>
+            <h2 className="cta-title">Start Your Project Today</h2>
+            <p className="cta-text">
+              Browse professional DXF files or request a custom design.
+            </p>
             <div className="cta-buttons">
               <Link to="/dxf-marketplace" className="btn btn-primary">
-                Explore DXF Files
+                Explore Marketplace
               </Link>
-              <Link to="/design-services" className="btn btn-secondary">
-                Get Custom Quote
+              <Link to="/3d-printing" className="btn btn-secondary">
+                3D Printing Services
               </Link>
             </div>
           </motion.div>
@@ -360,37 +246,43 @@ function HomePage() {
   );
 }
 
-function ServiceCard({ icon, title, description, link, delay }) {
+function ProductCard({ file, addToCart }) {
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 30 }} 
-      whileInView={{ opacity: 1, y: 0 }} 
-      viewport={{ once: true }} 
-      transition={{ duration: 0.5, delay }}
-    >
-      <Link to={link} className="service-card card">
-        <div className="service-icon">{icon}</div>
-        <h3 className="service-title">{title}</h3>
-        <p className="service-description">{description}</p>
-        <div className="service-arrow">→</div>
-      </Link>
-    </motion.div>
-  );
-}
-
-function FeatureCard({ number, title, description, delay }) {
-  return (
-    <motion.div
-      className="feature-card"
-      initial={{ opacity: 0, x: -20 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay }}
-    >
-      <div className="feature-number">{number}</div>
-      <h3 className="feature-title">{title}</h3>
-      <p className="feature-description">{description}</p>
-    </motion.div>
+    <div className="product-card card">
+      <div className="product-image-wrapper">
+        <img
+          src={file.image || "/3593491.jpg"}
+          alt={file.name}
+          className="product-image"
+        />
+        {file.badge && <span className="product-badge">{file.badge}</span>}
+      </div>
+      <h3 className="product-name">{file.name}</h3>
+      <div className="product-rating">
+        <span className="stars">★★★★★</span>
+        <span className="rating-count">
+          ({file.reviews ?? file.downloads ?? 0})
+        </span>
+      </div>
+      <div className="product-price">
+        KES {Number(file.price || 0).toLocaleString()}
+        {file.originalPrice && (
+          <span className="product-original-price">
+            KES {Number(file.originalPrice).toLocaleString()}
+          </span>
+        )}
+      </div>
+      <p className="product-delivery">✓ Instant Digital Download</p>
+      <button
+        className="btn btn-primary"
+        style={{ marginTop: "0.5rem", width: "100%" }}
+        onClick={() =>
+          addToCart({ id: file.id, name: file.name, price: file.price || 0 })
+        }
+      >
+        Add to Cart
+      </button>
+    </div>
   );
 }
 

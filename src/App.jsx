@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useLocation,
+} from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import "./App.css";
 
@@ -11,13 +17,13 @@ import PrintingServices from "./pages/PrintingServices";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
+import Admin from "./pages/Admin";
 
 function App() {
   const [cart, setCart] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Load cart from localStorage
     const savedCart = localStorage.getItem("cart");
     if (savedCart) {
       setCart(JSON.parse(savedCart));
@@ -25,7 +31,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Save cart to localStorage
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
@@ -69,19 +74,43 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <Header cartCount={cartCount} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+        <Header
+          cartCount={cartCount}
+          menuOpen={menuOpen}
+          setMenuOpen={setMenuOpen}
+        />
         <AnimatePresence mode="wait">
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/dxf-marketplace" element={<DXFMarketplace addToCart={addToCart} />} />
+            <Route
+              path="/"
+              element={<HomePage addToCart={addToCart} />}
+            />
+            <Route
+              path="/dxf-marketplace"
+              element={<DXFMarketplace addToCart={addToCart} />}
+            />
             <Route path="/design-services" element={<DesignServices />} />
             <Route path="/3d-printing" element={<PrintingServices />} />
             <Route
               path="/cart"
-              element={<Cart cart={cart} updateQuantity={updateQuantity} removeFromCart={removeFromCart} />}
+              element={
+                <Cart
+                  cart={cart}
+                  updateQuantity={updateQuantity}
+                  removeFromCart={removeFromCart}
+                />
+              }
             />
-            <Route path="/checkout" element={<Checkout cart={cart} clearCart={clearCart} />} />
-            <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+            <Route
+              path="/checkout"
+              element={<Checkout cart={cart} clearCart={clearCart} />}
+            />
+            <Route
+              path="/order-confirmation/:orderId"
+              element={<OrderConfirmation />}
+            />
+            {/* 🔐 NEW */}
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </AnimatePresence>
       </div>
@@ -120,7 +149,10 @@ function Header({ cartCount, menuOpen, setMenuOpen }) {
           </motion.div>
         </Link>
 
-        <button className={`menu-toggle ${menuOpen ? "open" : ""}`} onClick={() => setMenuOpen(!menuOpen)}>
+        <button
+          className={`menu-toggle ${menuOpen ? "open" : ""}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
           <span></span>
           <span></span>
           <span></span>
@@ -140,7 +172,13 @@ function Header({ cartCount, menuOpen, setMenuOpen }) {
             3D Printing
           </Link>
           <Link to="/cart" className="nav-link cart-link">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
               <circle cx="9" cy="21" r="1" />
               <circle cx="20" cy="21" r="1" />
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
@@ -154,4 +192,3 @@ function Header({ cartCount, menuOpen, setMenuOpen }) {
 }
 
 export default App;
-
