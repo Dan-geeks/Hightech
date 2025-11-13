@@ -1,120 +1,155 @@
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+.bottom-section {
   background-color: var(--secondary);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 999;
-  padding: 0;
+  border-top: 2px solid var(--primary);
+  padding: 3rem 2rem;
+  margin-top: 4rem;
 }
 
-.bottom-nav-container {
+.contact-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.contact-heading {
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  letter-spacing: 0.5px;
+}
+
+.contact-links {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
-  max-width: 100%;
-  padding: 0.5rem 0;
+  gap: 3rem;
+  flex-wrap: wrap;
 }
 
-.bottom-nav-link {
+.contact-link {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   color: #ffffff;
   text-decoration: none;
-  padding: 0.5rem 0.75rem;
+  padding: 1.5rem 2rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
-  flex: 1;
-  position: relative;
+  min-width: 200px;
 }
 
-.bottom-nav-link:hover {
+.contact-link:hover {
   color: var(--primary);
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--primary);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.contact-link:active {
   transform: translateY(-2px);
 }
 
-.bottom-nav-link:active {
-  transform: translateY(0);
-}
-
-.bottom-nav-icon {
-  width: 24px;
-  height: 24px;
-  margin-bottom: 0.25rem;
+.contact-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
   transition: all 0.3s ease;
 }
 
-.bottom-nav-link:hover .bottom-nav-icon {
+.contact-link:hover .contact-icon {
   color: var(--primary);
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
-.bottom-nav-text {
-  font-size: 0.75rem;
-  font-weight: 500;
+.contact-text {
+  font-size: 1.1rem;
+  font-weight: 600;
   text-align: center;
-  white-space: nowrap;
 }
 
-/* Special styling for WhatsApp CTA */
-.bottom-nav-cta {
-  position: relative;
+/* Special styling for WhatsApp */
+.whatsapp-link:hover {
+  border-color: #25D366;
+  color: #25D366;
 }
 
-.bottom-nav-cta::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  background-color: var(--primary);
-  border-radius: 50%;
-  animation: pulse 2s infinite;
+.whatsapp-link:hover .contact-icon {
+  color: #25D366;
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: translateX(-50%) scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: translateX(-50%) scale(1.5);
-  }
+/* Special styling for Email */
+.email-link:hover {
+  border-color: #EA4335;
+  color: #EA4335;
+}
+
+.email-link:hover .contact-icon {
+  color: #EA4335;
 }
 
 /* Responsive adjustments */
-@media (max-width: 480px) {
-  .bottom-nav-text {
-    font-size: 0.65rem;
+@media (max-width: 768px) {
+  .bottom-section {
+    padding: 2.5rem 1.5rem;
+    margin-top: 3rem;
   }
 
-  .bottom-nav-icon {
-    width: 20px;
-    height: 20px;
+  .contact-heading {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
   }
 
-  .bottom-nav-link {
-    padding: 0.4rem 0.5rem;
+  .contact-links {
+    gap: 1.5rem;
+  }
+
+  .contact-link {
+    min-width: 160px;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .contact-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 0.75rem;
+  }
+
+  .contact-text {
+    font-size: 1rem;
   }
 }
 
-@media (min-width: 768px) {
-  .bottom-nav-icon {
-    width: 28px;
-    height: 28px;
+@media (max-width: 480px) {
+  .bottom-section {
+    padding: 2rem 1rem;
+    margin-top: 2rem;
   }
 
-  .bottom-nav-text {
-    font-size: 0.85rem;
+  .contact-heading {
+    font-size: 1.25rem;
   }
 
-  .bottom-nav-link {
-    padding: 0.75rem 1rem;
+  .contact-links {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .contact-link {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .contact-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .contact-text {
+    font-size: 0.95rem;
   }
 }
