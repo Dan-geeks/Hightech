@@ -227,6 +227,7 @@ body {
 .page {
   min-height: calc(100vh - 120px);
   padding-top: 0;
+  padding-bottom: 80px; /* Space for bottom navigation */
   background: var(--bg-light);
 }
 
