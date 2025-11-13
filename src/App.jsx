@@ -19,6 +19,9 @@ import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import Admin from "./pages/Admin";
 
+// Components
+import BottomNav from "./components/BottomNav";
+
 function App() {
   const [cart, setCart] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -113,6 +116,7 @@ function App() {
             <Route path="/admin" element={<Admin />} />
           </Routes>
         </AnimatePresence>
+        <BottomNav />
       </div>
     </Router>
   );
