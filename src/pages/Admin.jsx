@@ -35,8 +35,22 @@ const emptyFile = {
   rating: 4.5,
 };
 
+const emptyPrintItem = {
+  name: "",
+  price: 0,
+  description: "",
+  image: "",
+  category: "Figurines",
+  material: "PLA",
+  printTime: "2-3 days",
+  orders: 0,
+  rating: 4.5,
+  rushAvailable: false,
+};
+
 function Admin() {
   const [user, setUser] = useState(null);
+  const [activeTab, setActiveTab] = useState("dxf");
 
   // login form
   const [login, setLogin] = useState({
@@ -48,6 +62,10 @@ function Admin() {
   // DXF files
   const [files, setFiles] = useState([]);
   const [loadingFiles, setLoadingFiles] = useState(true);
+
+  // 3D Printing items
+  const [printItems, setPrintItems] = useState([]);
+  const [loadingPrintItems, setLoadingPrintItems] = useState(true);
 
   // edit form
   const [editingId, setEditingId] = useState(null);
@@ -64,9 +82,10 @@ function Admin() {
       setUser(u || null);
     });
 
-    const q = query(collection(db, "dxfFiles"), orderBy("name"));
+    // DXF Files listener
+    const qFiles = query(collection(db, "dxfFiles"), orderBy("name"));
     const unsubFiles = onSnapshot(
-      q,
+      qFiles,
       (snap) => {
         const docs = snap.docs.map((d) => ({
           id: d.id,
@@ -81,9 +100,28 @@ function Admin() {
       }
     );
 
+    // 3D Printing Items listener
+    const qPrint = query(collection(db, "printingItems"), orderBy("name"));
+    const unsubPrint = onSnapshot(
+      qPrint,
+      (snap) => {
+        const docs = snap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        }));
+        setPrintItems(docs);
+        setLoadingPrintItems(false);
+      },
+      (err) => {
+        console.error("Error loading printingItems:", err);
+        setLoadingPrintItems(false);
+      }
+    );
+
     return () => {
       unsubAuth();
       unsubFiles();
+      unsubPrint();
     };
   }, []);
 
@@ -108,35 +146,54 @@ function Admin() {
   const handleLogout = async () => {
     await signOut(auth);
     setEditingId(null);
-    setForm(emptyFile);
+    setForm(activeTab === "dxf" ? emptyFile : emptyPrintItem);
   };
 
-  // --- DXF edit handlers ---
+  // --- edit handlers ---
   const startNew = () => {
     setEditingId(null);
-    setForm(emptyFile);
+    setForm(activeTab === "dxf" ? emptyFile : emptyPrintItem);
   };
 
-  const startEdit = (file) => {
-    setEditingId(file.id);
-    setForm({
-      name: file.name || "",
-      price: file.price || 0,
-      description: file.description || "",
-      image: file.image || "",
-      complexity: file.complexity || "Beginner",
-      format: file.format || "DXF",
-      downloads: file.downloads || 0,
-      rating: file.rating || 4.5,
-    });
+  const startEdit = (item) => {
+    setEditingId(item.id);
+    if (activeTab === "dxf") {
+      setForm({
+        name: item.name || "",
+        price: item.price || 0,
+        description: item.description || "",
+        image: item.image || "",
+        complexity: item.complexity || "Beginner",
+        format: item.format || "DXF",
+        downloads: item.downloads || 0,
+        rating: item.rating || 4.5,
+      });
+    } else {
+      setForm({
+        name: item.name || "",
+        price: item.price || 0,
+        description: item.description || "",
+        image: item.image || "",
+        category: item.category || "Figurines",
+        material: item.material || "PLA",
+        printTime: item.printTime || "2-3 days",
+        orders: item.orders || 0,
+        rating: item.rating || 4.5,
+        rushAvailable: item.rushAvailable || false,
+      });
+    }
   };
 
   const handleFormChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     let v = value;
-    if (["price", "downloads", "rating"].includes(name)) {
+    
+    if (type === "checkbox") {
+      v = checked;
+    } else if (["price", "downloads", "orders", "rating"].includes(name)) {
       v = Number(value);
     }
+    
     setForm((prev) => ({ ...prev, [name]: v }));
   };
 
@@ -144,34 +201,40 @@ function Admin() {
     e.preventDefault();
     setSaving(true);
 
+    const collectionName = activeTab === "dxf" ? "dxfFiles" : "printingItems";
+
     try {
       if (editingId) {
-        await updateDoc(doc(db, "dxfFiles", editingId), form);
+        await updateDoc(doc(db, collectionName, editingId), form);
       } else {
-        await addDoc(collection(db, "dxfFiles"), form);
+        await addDoc(collection(db, collectionName), form);
       }
 
       setEditingId(null);
-      setForm(emptyFile);
+      setForm(activeTab === "dxf" ? emptyFile : emptyPrintItem);
     } catch (err) {
       console.error(err);
-      alert("Error saving DXF file: " + err.message);
+      alert(`Error saving ${activeTab === "dxf" ? "DXF file" : "printing item"}: ` + err.message);
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this DXF file?")) return;
+    const collectionName = activeTab === "dxf" ? "dxfFiles" : "printingItems";
+    const itemType = activeTab === "dxf" ? "DXF file" : "printing item";
+    
+    if (!window.confirm(`Delete this ${itemType}?`)) return;
+    
     try {
-      await deleteDoc(doc(db, "dxfFiles", id));
+      await deleteDoc(doc(db, collectionName, id));
       if (editingId === id) {
         setEditingId(null);
-        setForm(emptyFile);
+        setForm(activeTab === "dxf" ? emptyFile : emptyPrintItem);
       }
     } catch (err) {
       console.error(err);
-      alert("Error deleting DXF file: " + err.message);
+      alert(`Error deleting ${itemType}: ` + err.message);
     }
   };
 
@@ -180,7 +243,8 @@ function Admin() {
     const file = e.target.files && e.target.files[0];
     if (!file) return;
 
-    const storagePath = `dxfImages/${Date.now()}_${file.name}`;
+    const folderName = activeTab === "dxf" ? "dxfImages" : "printingImages";
+    const storagePath = `${folderName}/${Date.now()}_${file.name}`;
     const storageRef = ref(storage, storagePath);
 
     const uploadTask = uploadBytesResumable(storageRef, file);
@@ -207,6 +271,13 @@ function Admin() {
     );
   };
 
+  // Switch tab handler
+  const handleTabSwitch = (tab) => {
+    setActiveTab(tab);
+    setEditingId(null);
+    setForm(tab === "dxf" ? emptyFile : emptyPrintItem);
+  };
+
   // --- LOGIN SCREEN ---
   if (!user) {
     return (
@@ -220,8 +291,7 @@ function Admin() {
             <p className="eyebrow">ADMIN</p>
             <h1 className="section-title">Admin Login</h1>
             <p className="section-subtitle">
-              Log in with the High Tech admin email to manage DXF files and
-              pricing.
+              Log in with the High Tech admin email to manage DXF files and 3D printing items.
             </p>
 
             {loginError && (
@@ -270,16 +340,18 @@ function Admin() {
   }
 
   // --- ADMIN DASHBOARD ---
+  const currentItems = activeTab === "dxf" ? files : printItems;
+  const currentLoading = activeTab === "dxf" ? loadingFiles : loadingPrintItems;
+
   return (
     <div className="admin page">
       <div className="container">
         <div className="admin-header">
           <div>
             <p className="eyebrow">ADMIN PANEL</p>
-            <h1 className="section-title">DXF Management</h1>
+            <h1 className="section-title">Product Management</h1>
             <p className="section-subtitle">
-              View and edit existing DXF files. Updates go live instantly on
-              the marketplace.
+              Manage DXF files and 3D printing items. Updates go live instantly.
             </p>
           </div>
           <div className="admin-header-actions">
@@ -290,36 +362,53 @@ function Admin() {
           </div>
         </div>
 
+        {/* Tab Navigation */}
+        <div className="admin-tabs">
+          <button
+            className={`admin-tab ${activeTab === "dxf" ? "active" : ""}`}
+            onClick={() => handleTabSwitch("dxf")}
+          >
+            📄 DXF Files
+          </button>
+          <button
+            className={`admin-tab ${activeTab === "printing" ? "active" : ""}`}
+            onClick={() => handleTabSwitch("printing")}
+          >
+            🖨️ 3D Printing
+          </button>
+        </div>
+
         <div className="admin-layout">
-          {/* LEFT: existing DXF list */}
+          {/* LEFT: existing items list */}
           <motion.div
             className="card admin-list-card"
             initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}
+            key={activeTab}
           >
             <div className="admin-list-header">
-              <h2>Existing DXF Files</h2>
+              <h2>{activeTab === "dxf" ? "DXF Files" : "3D Printing Items"}</h2>
               <button
                 className="btn btn-secondary"
                 type="button"
                 onClick={startNew}
               >
-                + New DXF File
+                + New {activeTab === "dxf" ? "DXF" : "Print Item"}
               </button>
             </div>
 
-            {loadingFiles ? (
+            {currentLoading ? (
               <div className="loading">
                 <div className="spinner" />
               </div>
-            ) : files.length === 0 ? (
+            ) : currentItems.length === 0 ? (
               <p
                 style={{
                   fontSize: "0.9rem",
                   color: "var(--text-secondary)",
                 }}
               >
-                No DXF files yet. Click “New DXF File” to add your first one.
+                No items yet. Click "New {activeTab === "dxf" ? "DXF" : "Print Item"}" to add your first one.
               </p>
             ) : (
               <div className="admin-table-wrapper">
@@ -328,33 +417,33 @@ function Admin() {
                     <tr>
                       <th>Name</th>
                       <th>Price (KES)</th>
-                      <th>Downloads</th>
+                      <th>{activeTab === "dxf" ? "Downloads" : "Orders"}</th>
                       <th></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {files.map((file) => (
+                    {currentItems.map((item) => (
                       <tr
-                        key={file.id}
-                        className={editingId === file.id ? "active" : ""}
+                        key={item.id}
+                        className={editingId === item.id ? "active" : ""}
                       >
-                        <td>{file.name}</td>
+                        <td>{item.name}</td>
                         <td>
-                          {Number(file.price || 0).toLocaleString("en-KE")}
+                          {Number(item.price || 0).toLocaleString("en-KE")}
                         </td>
-                        <td>{file.downloads || 0}</td>
+                        <td>{activeTab === "dxf" ? (item.downloads || 0) : (item.orders || 0)}</td>
                         <td className="admin-table-actions">
                           <button
                             type="button"
                             className="admin-link-button"
-                            onClick={() => startEdit(file)}
+                            onClick={() => startEdit(item)}
                           >
                             Edit
                           </button>
                           <button
                             type="button"
                             className="admin-link-button danger"
-                            onClick={() => handleDelete(file.id)}
+                            onClick={() => handleDelete(item.id)}
                           >
                             Delete
                           </button>
@@ -372,19 +461,22 @@ function Admin() {
             className="card admin-form-card"
             initial={{ opacity: 0, x: 15 }}
             animate={{ opacity: 1, x: 0 }}
+            key={activeTab + editingId}
           >
-            <h2>{editingId ? "Edit DXF File" : "New DXF File"}</h2>
+            <h2>{editingId ? "Edit" : "New"} {activeTab === "dxf" ? "DXF File" : "Print Item"}</h2>
             <p className="section-subtitle" style={{ marginBottom: "1rem" }}>
-              Change the name, price, description and image for your files.
+              {activeTab === "dxf" 
+                ? "Manage DXF file details, pricing, and images."
+                : "Manage 3D printing item details, materials, and pricing."}
             </p>
 
             <form className="admin-form" onSubmit={handleSave}>
               <div className="form-group">
-                <label className="form-label" htmlFor="dxf-name">
+                <label className="form-label" htmlFor="item-name">
                   Name
                 </label>
                 <input
-                  id="dxf-name"
+                  id="item-name"
                   name="name"
                   className="form-input"
                   value={form.name}
@@ -394,11 +486,11 @@ function Admin() {
               </div>
 
               <div className="form-group">
-                <label className="form-label" htmlFor="dxf-price">
+                <label className="form-label" htmlFor="item-price">
                   Price (KES)
                 </label>
                 <input
-                  id="dxf-price"
+                  id="item-price"
                   name="price"
                   type="number"
                   min="0"
@@ -409,11 +501,11 @@ function Admin() {
               </div>
 
               <div className="form-group">
-                <label className="form-label" htmlFor="dxf-description">
+                <label className="form-label" htmlFor="item-description">
                   Description
                 </label>
                 <textarea
-                  id="dxf-description"
+                  id="item-description"
                   name="description"
                   className="form-textarea"
                   value={form.description}
@@ -423,11 +515,11 @@ function Admin() {
 
               {/* Image upload */}
               <div className="form-group">
-                <label className="form-label" htmlFor="dxf-image-file">
+                <label className="form-label" htmlFor="item-image-file">
                   Image (upload from device)
                 </label>
                 <input
-                  id="dxf-image-file"
+                  id="item-image-file"
                   type="file"
                   accept="image/*"
                   className="form-input"
@@ -442,81 +534,193 @@ function Admin() {
                   <div className="image-preview">
                     <img src={form.image} alt="Preview" />
                     <p className="image-preview-text">
-                      This image URL is stored with the DXF file.
+                      This image is stored in Firebase Storage.
                     </p>
                   </div>
                 )}
               </div>
 
-              <div className="admin-inline-group">
-                <div className="form-group">
-                  <label className="form-label" htmlFor="dxf-complexity">
-                    Complexity
-                  </label>
-                  <select
-                    id="dxf-complexity"
-                    name="complexity"
-                    className="form-select"
-                    value={form.complexity}
-                    onChange={handleFormChange}
-                  >
-                    <option>Beginner</option>
-                    <option>Intermediate</option>
-                    <option>Advanced</option>
-                  </select>
-                </div>
+              {activeTab === "dxf" ? (
+                // DXF-specific fields
+                <>
+                  <div className="admin-inline-group">
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="dxf-complexity">
+                        Complexity
+                      </label>
+                      <select
+                        id="dxf-complexity"
+                        name="complexity"
+                        className="form-select"
+                        value={form.complexity}
+                        onChange={handleFormChange}
+                      >
+                        <option>Beginner</option>
+                        <option>Intermediate</option>
+                        <option>Advanced</option>
+                      </select>
+                    </div>
 
-                <div className="form-group">
-                  <label className="form-label" htmlFor="dxf-format">
-                    Format
-                  </label>
-                  <input
-                    id="dxf-format"
-                    name="format"
-                    className="form-input"
-                    value={form.format}
-                    onChange={handleFormChange}
-                    placeholder="DXF, DXF + PDF, DXF + SVG"
-                  />
-                </div>
-              </div>
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="dxf-format">
+                        Format
+                      </label>
+                      <input
+                        id="dxf-format"
+                        name="format"
+                        className="form-input"
+                        value={form.format}
+                        onChange={handleFormChange}
+                        placeholder="DXF, DXF + PDF"
+                      />
+                    </div>
+                  </div>
 
-              <div className="admin-inline-group">
-                <div className="form-group">
-                  <label className="form-label" htmlFor="dxf-downloads">
-                    Downloads
-                  </label>
-                  <input
-                    id="dxf-downloads"
-                    name="downloads"
-                    type="number"
-                    min="0"
-                    className="form-input"
-                    value={form.downloads}
-                    onChange={handleFormChange}
-                  />
-                </div>
+                  <div className="admin-inline-group">
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="dxf-downloads">
+                        Downloads
+                      </label>
+                      <input
+                        id="dxf-downloads"
+                        name="downloads"
+                        type="number"
+                        min="0"
+                        className="form-input"
+                        value={form.downloads}
+                        onChange={handleFormChange}
+                      />
+                    </div>
 
-                <div className="form-group">
-                  <label className="form-label" htmlFor="dxf-rating">
-                    Rating
-                  </label>
-                  <input
-                    id="dxf-rating"
-                    name="rating"
-                    type="number"
-                    min="0"
-                    max="5"
-                    step="0.1"
-                    className="form-input"
-                    value={form.rating}
-                    onChange={handleFormChange}
-                  />
-                </div>
-              </div>
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="dxf-rating">
+                        Rating
+                      </label>
+                      <input
+                        id="dxf-rating"
+                        name="rating"
+                        type="number"
+                        min="0"
+                        max="5"
+                        step="0.1"
+                        className="form-input"
+                        value={form.rating}
+                        onChange={handleFormChange}
+                      />
+                    </div>
+                  </div>
+                </>
+              ) : (
+                // 3D Printing-specific fields
+                <>
+                  <div className="admin-inline-group">
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="print-category">
+                        Category
+                      </label>
+                      <select
+                        id="print-category"
+                        name="category"
+                        className="form-select"
+                        value={form.category}
+                        onChange={handleFormChange}
+                      >
+                        <option>Figurines</option>
+                        <option>Functional Parts</option>
+                        <option>Decorative</option>
+                        <option>Miniatures</option>
+                        <option>Tools</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="print-material">
+                        Material
+                      </label>
+                      <select
+                        id="print-material"
+                        name="material"
+                        className="form-select"
+                        value={form.material}
+                        onChange={handleFormChange}
+                      >
+                        <option>PLA</option>
+                        <option>PETG</option>
+                        <option>ABS</option>
+                        <option>Resin</option>
+                        <option>Nylon</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="admin-inline-group">
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="print-time">
+                        Print Time
+                      </label>
+                      <input
+                        id="print-time"
+                        name="printTime"
+                        className="form-input"
+                        value={form.printTime}
+                        onChange={handleFormChange}
+                        placeholder="2-3 days"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="print-orders">
+                        Orders
+                      </label>
+                      <input
+                        id="print-orders"
+                        name="orders"
+                        type="number"
+                        min="0"
+                        className="form-input"
+                        value={form.orders}
+                        onChange={handleFormChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="admin-inline-group">
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="print-rating">
+                        Rating
+                      </label>
+                      <input
+                        id="print-rating"
+                        name="rating"
+                        type="number"
+                        min="0"
+                        max="5"
+                        step="0.1"
+                        className="form-input"
+                        value={form.rating}
+                        onChange={handleFormChange}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="print-rush">
+                        <input
+                          id="print-rush"
+                          name="rushAvailable"
+                          type="checkbox"
+                          checked={form.rushAvailable}
+                          onChange={handleFormChange}
+                          style={{ marginRight: "0.5rem" }}
+                        />
+                        Rush Available
+                      </label>
+                    </div>
+                  </div>
+                </>
+              )}
 
               <button className="btn btn-primary" type="submit" disabled={saving}>
-                {saving ? "Saving..." : "Save DXF File"}
+                {saving ? "Saving..." : `Save ${activeTab === "dxf" ? "DXF File" : "Print Item"}`}
               </button>
             </form>
           </motion.div>

@@ -12,6 +12,7 @@ import "./App.css";
 // Pages
 import HomePage from "./pages/HomePage";
 import DXFMarketplace from "./pages/DXFMarketplace";
+import PrintingMarketplace from "./pages/PrintingMarketplace";
 import DesignServices from "./pages/DesignServices";
 import PrintingServices from "./pages/PrintingServices";
 import Cart from "./pages/Cart";
@@ -92,6 +93,10 @@ function App() {
               path="/dxf-marketplace"
               element={<DXFMarketplace addToCart={addToCart} />}
             />
+            <Route
+              path="/printing-marketplace"
+              element={<PrintingMarketplace addToCart={addToCart} />}
+            />
             <Route path="/design-services" element={<DesignServices />} />
             <Route path="/3d-printing" element={<PrintingServices />} />
             <Route
@@ -112,7 +117,6 @@ function App() {
               path="/order-confirmation/:orderId"
               element={<OrderConfirmation />}
             />
-            {/* 🔐 NEW */}
             <Route path="/admin" element={<Admin />} />
           </Routes>
         </AnimatePresence>
@@ -169,11 +173,11 @@ function Header({ cartCount, menuOpen, setMenuOpen }) {
           <Link to="/dxf-marketplace" className="nav-link">
             DXF Files
           </Link>
+          <Link to="/printing-marketplace" className="nav-link">
+            3D Prints
+          </Link>
           <Link to="/design-services" className="nav-link">
             Design Services
-          </Link>
-          <Link to="/3d-printing" className="nav-link">
-            3D Printing
           </Link>
           <Link to="/cart" className="nav-link cart-link">
             <svg
